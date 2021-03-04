@@ -81,10 +81,102 @@ parser.add_argument('--foo', type=int, default=42, help='FOO!')
 parser.add_argument('bar', nargs='*', default=[1, 2, 3], help='BAR!')
 parser.print_help()
 """
-
+"""
 parser = argparse.ArgumentParser(
     prog='PROG',
     formatter_class=argparse.MetavarTypeHelpFormatter)
 parser.add_argument('--foo', type=int)
 parser.add_argument('bar', type=float)
 parser.print_help()
+"""
+"""
+parser = argparse.ArgumentParser(prog='PROG', prefix_chars='-+')
+parser.add_argument('+f')
+parser.add_argument('++bar')
+a = parser.parse_args('+f X ++bar Y'.split())
+print(a)
+"""
+"""
+with open('args.txt', 'w') as fp:
+       fp.write('-f\nbar')
+parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
+parser.add_argument('-f')
+a = parser.parse_args(['-f', 'foo', '@args.txt'])
+print(a)
+"""
+"""
+parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
+parser.add_argument('--foo')
+parser.add_argument('bar', nargs='?')
+a=parser.parse_args(['--foo', '1', 'BAR'])
+print(a)
+a=parser.parse_args([])
+print(a)
+"""
+"""# conflict_handler='resolve' 를 사용하면 같은 옵션의 문자열 사용가능
+parser = argparse.ArgumentParser(prog='PROG', conflict_handler='resolve')
+parser.add_argument('-f', '--foo', help='old foo help')
+parser.add_argument('--foo', help='new foo help')
+parser.print_help()
+"""
+""" #도움말 
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', help='foo help')
+args = parser.parse_args()
+"""
+# add_argument()
+# action
+parser = argparse.ArgumentParser()
+"""#action-store
+parser.add_argument('--foo')
+a = parser.parse_args('--foo 1'.split())
+print(a)
+#action-store_const
+parser.add_argument('--g', action='store_const', const=42)
+b = parser.parse_args(['--g', '--foo', '1'])
+print(b)
+"""
+"""#action-store_true/false
+parser.add_argument('--foo', action='store_true')
+parser.add_argument('--bar', action='store_false')
+parser.add_argument('--baz', action='store_false')
+a=parser.parse_args('--foo --bar'.split())
+print(a)
+"""
+"""
+#action-append 리스트에 저장 /추가
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', action='append')
+a=parser.parse_args('--foo 1 --foo 2'.split())
+print(a)
+"""
+"""
+#action-append_const 리스트에 저장하고 키워드인자로 지정된 값을 리스트에 추가
+parser = argparse.ArgumentParser()
+parser.add_argument('--str', dest='types', action='append_const', const=str)
+parser.add_argument('--int', dest='types', action='append_const', const=int)
+a = parser.parse_args('--str --int'.split())
+print(a)
+"""
+#action-count 키워드 인자가 등장한 횟수를 계산
+#help  파서의 모든 옵션에 대한 도움말 메시지
+"""#version 버전정보를 출력함
+parser = argparse.ArgumentParser(prog='PROG')
+parser.add_argument('--version', action='version', version='%(prog)s 2.0')
+a=parser.parse_args(['--version'])
+print(a)
+"""
+class FooAction(argparse.Action):
+       def __init__(self, option_strings, dest, nargs=None, **kwargs):
+              if nargs is not None:
+                     raise ValueError("nargs not allowed")
+              super(FooAction, self).__init__(option_strings, dest, **kwargs)
+       def __call__(self, parser, namespace, values, option_string=None):
+              print('%r %r %r' % (namespace, values, option_string))
+              setattr(namespace, self.dest, values)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', action= FooAction)
+parser.add_argument('bar', action=FooAction)
+args = parser.parse_args('1 --foo 2'.split())
+print(args)
