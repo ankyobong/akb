@@ -166,6 +166,13 @@ parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 a=parser.parse_args(['--version'])
 print(a)
 """
+"""#append  리스트를 저장하고 각 인자값으로 리스트 확장
+parser = argparse.ArgumentParser()
+parser.add_argument("--foo", action="extend", nargs="+", type=str)
+a=parser.parse_args(["--foo", "f1", "f2", "f3", "--foo", "f4"])
+print(a)
+"""
+"""############################################# 혼돈집합체 후에 해석
 class FooAction(argparse.Action):
        def __init__(self, option_strings, dest, nargs=None, **kwargs):
               if nargs is not None:
@@ -176,7 +183,37 @@ class FooAction(argparse.Action):
               setattr(namespace, self.dest, values)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--foo', action= FooAction)
+parser.add_argument('--foo', action=FooAction)
 parser.add_argument('bar', action=FooAction)
 args = parser.parse_args('1 --foo 2'.split())
 print(args)
+"""
+"""#nargs에 정수값
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', nargs=3)
+parser.add_argument('bar', nargs=1)
+a=parser.parse_args('c --foo a b c'.split())
+print(a)
+"""
+"""#nargs에 '?'
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', nargs='?', const='c', default='d')
+parser.add_argument('bar', nargs='?', default='d')
+parser.add_argument('baz', nargs='?', default='c')
+parser.parse_args(['XX', '--foo', 'YY'])
+
+a=parser.parse_args(['yyy', '--foo', 'sss'])
+print(a)
+a=parser.parse_args([])
+print(a)
+"""
+#nargs에 '*'값
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', nargs='*')
+parser.add_argument('--bar', nargs='*')
+parser.add_argument('baz', nargs='*')
+parser.add_argument('tas', nargs='*')
+a=parser.parse_args(' a b c d --foo x y --bar 1 2 3 3'.split())
+print(a)fx.py 
+fx.py 
+fx.py 
