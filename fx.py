@@ -1,4 +1,5 @@
 import argparse
+import math
 import textwrap
 
 """ # 정수 배열을 받아 합계 또는 최대값을 출력하는 프로그램
@@ -207,13 +208,67 @@ print(a)
 a=parser.parse_args([])
 print(a)
 """
-#nargs에 '*'값
+"""#nargs에 '*'값
 parser = argparse.ArgumentParser()
 parser.add_argument('--foo', nargs='*')
 parser.add_argument('--bar', nargs='*')
 parser.add_argument('baz', nargs='*')
 parser.add_argument('tas', nargs='*')
 a=parser.parse_args(' a b c d --foo x y --bar 1 2 3 3'.split())
-print(a)fx.py 
-fx.py 
-fx.py 
+print(a)
+"""
+"""#argparse.REMAINDER
+parser = argparse.ArgumentParser(prog='PROG')
+parser.add_argument('--foo')
+parser.add_argument('command')
+parser.add_argument('args', nargs=argparse.REMAINDER)
+print(parser.parse_args('--foo B cmd --arg1 XX ZZ'.split()))
+"""
+"""default 문자
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', default=42)
+a=parser.parse_args(['--foo', '2'])
+print(a)
+a=parser.parse_args([])
+print(a)
+"""
+"""#type
+parser = argparse.ArgumentParser()
+parser.add_argument('foo', type=int)
+parser.add_argument('bar', type=open)  #open >>>  mode=, bufsize=, encoding=, errors=
+parser.parse_args('2 temp.txt'.split())
+"""
+"""# 제곱근이 참인지 검사하는 그런거?
+def perfect_square(string):
+    value = int(string)
+    sqrt = math.sqrt(value)
+    if sqrt != int(sqrt):
+        msg = "%r is not a perfect square" % string
+        raise argparse.ArgumentTypeError(msg)
+    return value
+
+parser = argparse.ArgumentParser(prog='PROG')
+parser.add_argument('foo', type=perfect_square)
+parser.parse_args(['9'])
+
+parser.parse_args(['7'])
+"""
+"""#값의 범위를 검사하는 검사기로는  choices 키워드 인자가 더 편함
+parser = argparse.ArgumentParser(prog='PROG')
+parser.add_argument('foo', type=int, choices=range(5, 10))
+parser.parse_args(['7'])
+
+parser.parse_args(['11'])
+"""
+"""#choice 키워드 이나자로 전달하여 처리   명령행을 팟싱할때 인자의 값을 검사하고 인자를 받아들일수 업으면 에러 메시지를 표시
+parser = argparse.ArgumentParser(prog='game.py')
+parser.add_argument('move', choices=['rock', 'paper', 'scissors'])
+parser.parse_args(['rock'])
+
+parser.parse_args(['fire'])
+"""
+parser = argparse.ArgumentParser(prog='doors.py')
+parser.add_argument('door', type=int, choices=range(1, 4))
+print(parser.parse_args(['3']))
+
+parser.parse_args(['4'])
